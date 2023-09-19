@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     import argparse
     cmd_parser = argparse.ArgumentParser(prog='euclidea.py')
-    cmd_parser.add_argument("fname", type=str,
+    cmd_parser.add_argument("fname", type=str, default='02_beta/04_Angle30.py',
                             help="problem filename")
     config = cmd_parser.parse_args()
 

@@ -2,8 +2,10 @@ from constructions import *
 from environment import load_level
 import itertools
 
+
 def swap_list(l, i, j):
     l[i], l[j] = l[j], l[i]
+
 
 class BruteForceEnv:
     def __init__(self, env):
@@ -18,7 +20,7 @@ class BruteForceEnv:
             if isinstance(obj, Point):
                 self.add_point(obj)
             else:
-                assert(isinstance(obj, PointSet))
+                assert (isinstance(obj, PointSet))
                 self.add_point_set(obj)
 
     def add_point_set(self, ps):
@@ -63,30 +65,30 @@ class BruteForceEnv:
         if limit < self.goal_ps_num: return None
 
         # try lines, circles and perpendicular bisectors
-        for (i1,p1),(i2,p2) in itertools.combinations(enumerate(self.points), 2):
-            result = self.try_add(line_tool(p1, p2), limit-1, (i1,i2,Line))
+        for (i1, p1), (i2, p2) in itertools.combinations(enumerate(self.points), 2):
+            result = self.try_add(line_tool(p1, p2), limit - 1, (i1, i2, Line))
             if result is not None: return result
-            result = self.try_add(circle_tool(p1, p2), limit-1, (i1,i2,Circle))
+            result = self.try_add(circle_tool(p1, p2), limit - 1, (i1, i2, Circle))
             if result is not None: return result
-            result = self.try_add(circle_tool(p2, p1), limit-1, (i2,i1,Circle))
+            result = self.try_add(circle_tool(p2, p1), limit - 1, (i2, i1, Circle))
             if result is not None: return result
             if all_steps:
-                result = self.try_add(perp_bisector_tool(p1, p2), limit-1, (i1,i2,"perp_bisector"))
+                result = self.try_add(perp_bisector_tool(p1, p2), limit - 1, (i1, i2, "perp_bisector"))
                 if result is not None: return result
 
         if all_steps:
             # try perpendicular and parallel lines
-            for ips,ps in enumerate(self.point_sets):
+            for ips, ps in enumerate(self.point_sets):
                 if not isinstance(ps, Line): continue
-                for ip,p in enumerate(self.points):
-                    result = self.try_add(perp_tool(ps, p), limit-1, (ips,ip,"perpendicular"))
+                for ip, p in enumerate(self.points):
+                    result = self.try_add(perp_tool(ps, p), limit - 1, (ips, ip, "perpendicular"))
                     if result is not None: return result
-                    result = self.try_add(parallel_tool(ps, p), limit-1, (ips,ip,"parallel"))
+                    result = self.try_add(parallel_tool(ps, p), limit - 1, (ips, ip, "parallel"))
                     if result is not None: return result
             # try angle bisectors
-            for (i1,p1),(i2,p2),(i3,p3) in itertools.combinations(enumerate(self.points), 3):
-                result = self.try_add(angle_bisector_tool(p1, p2, p3), limit-1,
-                                      (i1,i2,i3,"angle_bisector"))
+            for (i1, p1), (i2, p2), (i3, p3) in itertools.combinations(enumerate(self.points), 3):
+                result = self.try_add(angle_bisector_tool(p1, p2, p3), limit - 1,
+                                      (i1, i2, i3, "angle_bisector"))
                 if result is not None: return result
 
         return None
@@ -101,7 +103,7 @@ class BruteForceEnv:
 
         if not self.add_point_set(new_ps): return None
         result = self.search(new_limit)
-        #print('try_add inside', result)
+        # print('try_add inside', result)
 
         (
             self.goal_p_num,
@@ -112,15 +114,18 @@ class BruteForceEnv:
         del self.points[p_len:]
         del self.point_sets[ps_len:]
 
-        if result is None: return None
-        else: return (info,)+result
+        if result is None:
+            return None
+        else:
+            return (info,) + result
+
 
 all_steps = False
-env = load_level("euclitest", "01_svrk")
-#env.objs.extend(env.goals[0][:3])
+env = load_level("euclitest", "01_svrk",1)
+# env.objs.extend(env.goals[0][:3])
 bf = BruteForceEnv(env)
 for p in bf.points:
     print(p)
-#l = line_tool(bf.points[1], bf.points[4])
-#print('try_add', bf.try_add(l, 0, (1,4,Line)))
+# l = line_tool(bf.points[1], bf.points[4])
+# print('try_add', bf.try_add(l, 0, (1,4,Line)))
 print('search', bf.search(4))
